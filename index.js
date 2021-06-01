@@ -32,7 +32,7 @@ client.on("message", async (msg) => {
   // comandos
   // Gadiao (Gabriel)
   if (msg.content === prefixo + "gadiao") {
-    msg.channel.send("");
+    msg.channel.send("Ah, mas ela é diferente meu!");
   }
   if (msg.content === prefixo + "will") {
     servidores.server.connection.play(
