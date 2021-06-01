@@ -50,6 +50,9 @@ client.on("message", async (msg) => {
       servidores.server.connection.play(ytdl(video, ytdlOptions));
     } catch (error) {
       console.log(error);
+      ///////
+      //////////////
+      /////////
     }
   }
 });
