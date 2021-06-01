@@ -29,31 +29,25 @@ client.on("message", async (msg) => {
     return;
   }
 
-  //comandos
-  //Gadiao (Gabriel)
+  // comandos
+  // Gadiao (Gabriel)
   if (msg.content === prefixo + "gadiao") {
-    msg.channel.send('');
+    msg.channel.send("");
   }
   if (msg.content === prefixo + "will") {
     servidores.server.connection.play(
-        ytdl("https://www.youtube.com/watch?v=7y9y2zuUmBE", ytdlOptions))
-  };
+      ytdl("https://www.youtube.com/watch?v=7y9y2zuUmBE", ytdlOptions)
+    );
+  }
   if (msg.content === prefixo + "entre") {
     servidores.server.connection = await msg.member.voice.channel.join();
-    const {
-      server: { connection },
-    } = servidores;
   }
-  if (msg.content === prefixo + "play") {
-    const {
-      server: { connection },
-    } = servidores;
-    console.log(connection);
+  if (msg.content.includes("play")) {
+    const { content } = msg;
+
+    const video = content.split(" ")[1];
     try {
-      servidores.server.connection.play(
-        ytdl("https://www.youtube.com/watch?v=7y9y2zuUmBE", ytdlOptions)
-      );
-      // servidores.server.connection.play('./teste.mp3');
+      servidores.server.connection.play(ytdl(video, ytdlOptions));
     } catch (error) {
       console.log(error);
     }
