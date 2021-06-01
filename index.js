@@ -39,8 +39,8 @@ client.on('message', async (msg) => {
         const { server: { connection } } = servidores;
         console.log(connection);
         try {
-         //   servidores.server.connection.play(ytdl('https://www.youtube.com/watch?v=7y9y2zuUmBE', ytdlOptions));
-            servidores.server.connection.play('./teste.mp3');
+            servidores.server.connection.play(ytdl('https://www.youtube.com/watch?v=7y9y2zuUmBE', ytdlOptions));
+            // servidores.server.connection.play('./teste.mp3');
         } catch (error) {
             console.log(error);
         }
