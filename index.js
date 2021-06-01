@@ -47,12 +47,6 @@ client.on("message", async (msg) => {
       "Teu monitor é ultrawide? Pq eu vo manda nude aqui... 8======================================D"
     );
   }
-
-  //Soma (.soma [número1] + [número2] = resultado)
-  if (msg.content === prefixo + ``) {
-    //código - - - -
-  }
-
   //comando Will
   if (msg.content === prefixo + "will") {
     msg.channel.send("AAAAAAAIIIIII WILLLL, MACHUUUUCA");
