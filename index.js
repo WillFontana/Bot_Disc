@@ -1,50 +1,63 @@
-const Discord = require('discord.js');
-const ytdl = require('ytdl-core')
+const Discord = require("discord.js");
+const ytdl = require("ytdl-core");
 const client = new Discord.Client();
-const configs = require('./config.json')
-
+const configs = require("./config.json");
 
 const prefixo = configs.PREFIX;
 
 const ytdlOptions = {
-    filter: 'audioonly'
-}
+  filter: "audioonly",
+};
 
 const servidores = {
-    server: {
-        connection: null,
-        dispatcher: null
-    }
-}
+  server: {
+    connection: null,
+    dispatcher: null,
+  },
+};
 
-client.on('ready', () => {
-    console.log('To na ativa por aqui!')
+client.on("ready", () => {
+  console.log("To na ativa por aqui!");
 });
 
-client.on('message', async (msg) => {
-    //filtro
-    if (!msg.guild) return;
-    if (!msg.content.startsWith(prefixo)) return;
-    if (!msg.member.voice.channel) {
-        msg.channel.send('Tu não tá na merda de um canal de voz mano...'); return
-    };
+client.on("message", async (msg) => {
+  //filtro
+  if (!msg.guild) return;
+  if (!msg.content.startsWith(prefixo)) return;
+  if (!msg.member.voice.channel) {
+    msg.channel.send("Tu não tá na merda de um canal de voz mano...");
+    return;
+  }
 
-    //comandos
-    if (msg.content === prefixo + 'entre') {
-        servidores.server.connection = await msg.member.voice.channel.join();
-        const { server: { connection } } = servidores;
-        console.log(connection);
+  //comandos
+  //Gadiao (Gabriel)
+  if (msg.content === prefixo + "gadiao") {
+    msg.channel.send('');
+  }
+  if (msg.content === prefixo + "will") {
+    servidores.server.connection.play(
+        ytdl("https://www.youtube.com/watch?v=7y9y2zuUmBE", ytdlOptions))
+  };
+  if (msg.content === prefixo + "entre") {
+    servidores.server.connection = await msg.member.voice.channel.join();
+    const {
+      server: { connection },
+    } = servidores;
+  }
+  if (msg.content === prefixo + "play") {
+    const {
+      server: { connection },
+    } = servidores;
+    console.log(connection);
+    try {
+      servidores.server.connection.play(
+        ytdl("https://www.youtube.com/watch?v=7y9y2zuUmBE", ytdlOptions)
+      );
+      // servidores.server.connection.play('./teste.mp3');
+    } catch (error) {
+      console.log(error);
     }
-    if (msg.content === prefixo + 'play') {
-        const { server: { connection } } = servidores;
-        console.log(connection);
-        try {
-            servidores.server.connection.play(ytdl('https://www.youtube.com/watch?v=7y9y2zuUmBE', ytdlOptions));
-            // servidores.server.connection.play('./teste.mp3');
-        } catch (error) {
-            console.log(error);
-        }
-    }
+  }
 });
 
 client.login(configs.TOKEN_DISCORD);
