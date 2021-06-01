@@ -7,35 +7,42 @@ const configs = require('./config.json')
 const prefixo = configs.PREFIX;
 
 const ytdlOptions = {
-  filter: 'audioonly'
+    filter: 'audioonly'
 }
 
 const servidores = {
-    'server': {
+    server: {
         connection: null,
-        dispatcher:null
+        dispatcher: null
     }
 }
 
 client.on('ready', () => {
-    console.log('To na ativa por aqui!')    
+    console.log('To na ativa por aqui!')
 });
 
 client.on('message', async (msg) => {
     //filtro
-    if(!msg.guild) return;
-    if(!msg.content.startsWith(prefixo)) return;
-    if(!msg.member.voice.channel) {
+    if (!msg.guild) return;
+    if (!msg.content.startsWith(prefixo)) return;
+    if (!msg.member.voice.channel) {
         msg.channel.send('Tu não tá na merda de um canal de voz mano...'); return
     };
 
-
     //comandos
-    if(msg.content === prefixo + 'entre'){
+    if (msg.content === prefixo + 'entre') {
         servidores.server.connection = await msg.member.voice.channel.join();
+        const { server: { connection } } = servidores;
+        console.log(connection);
     }
-    if(msg.content === prefixo + 'play'){
-        servidores.server.connection.play(ytdl('https://www.youtube.com/watch?v=7y9y2zuUmBE'));
+    if (msg.content === prefixo + 'play') {
+        const { server: { connection } } = servidores;
+        console.log(connection);
+        try {
+            servidores.server.connection.play('./teste.mp3');
+        } catch (error) {
+            console.log(error);
+        }
     }
 });
 
