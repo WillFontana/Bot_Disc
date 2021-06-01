@@ -34,12 +34,9 @@ client.on("message", async (msg) => {
   if (msg.content === prefixo + "gadiao") {
     msg.channel.send("Ah, mas ela é diferente meu!");
   }
-  //////////////////////
-  ////////////////////
-  /////////////////
   if (msg.content === prefixo + "will") {
     servidores.server.connection.play(
-      ytdl("https://www.youtube.com/watch?v=7y9y2zuUmBE", ytdlOptions)
+      ytdl("https://www.youtube.com/watch?v=uGFhobnd1Mg", ytdlOptions)
     );
   }
   if (msg.content === prefixo + "entre") {
