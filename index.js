@@ -70,6 +70,17 @@ client.on("message", async (msg) => {
     msg.channel.send("Calma parça, já to saindo...");
   }
 
+  //instagram dos Dev's do projeto (Dev's, coloquem seus instas aqui)
+  if (msg.content === prefixo + "insta") {
+    msg.channel.send(
+      "O Insta dos Dev's responsáveis por esse bot incrível são:"
+    );
+    msg.channel.send("@leo_forin ; Link: https://www.instagram.com/leo_forin/");
+    msg.channel.send(
+      "@will_fontana ; Link: https://www.instagram.com/will_fontana/"
+    );
+  }
+
   //comando de dar play em música
   if (msg.content.includes("play" && prefixo + "p")) {
     servidores.server.connection = await msg.member.voice.channel.join();
