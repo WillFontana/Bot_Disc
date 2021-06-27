@@ -94,12 +94,46 @@ client.on("message", async (msg) => {
       parseInt(idade);
       number = 2021;
       ano2 = number - idade;
-      msg.channel.send(`${ac}${ano2 * -1}`);
+      msg.channel.send(
+        `Tu realmente nasceu em ${ano2 * -1} ${ac} ? Tá de sacanagem irmão`
+      );
     } else {
       msg.channel.send(`Pera ai, é serio que você é de ${ano} ?? Credo`);
     }
   }
-  
+  // Comando de contas
+  if (msg.content.includes("conta")) {
+    if (msg.content.includes("+")) {
+      let numero1 = msg.content.split(" ")[1];
+      let numero2 = msg.content.split("+ ")[1];
+      let sum = parseFloat(numero1) + parseFloat(numero2);
+      msg.channel.send(sum);
+    }
+    if (msg.content.includes("-")) {
+      let numero1 = msg.content.split(" ")[1];
+      let numero2 = msg.content.split("- ")[1];
+      let sum = parseFloat(numero1) - parseFloat(numero2);
+      msg.channel.send(sum);
+    }
+    if (msg.content.includes("*")) {
+      let numero1 = msg.content.split(" ")[1];
+      let numero2 = msg.content.split("* ")[1];
+      let sum = parseFloat(numero1) * parseFloat(numero2);
+      msg.channel.send(sum);
+    }
+    if (msg.content.includes("/")) {
+      if (msg.content.includes("0 / 0")) {
+        msg.channel.send(
+          "Primeira lei da matemática babaca... Zero não se divide por zero..."
+        );
+      } else {
+        let numero1 = msg.content.split(" ")[1];
+        let numero2 = msg.content.split("/ ")[1];
+        let sum = parseFloat(numero1) / parseFloat(numero2);
+        msg.channel.send(sum);
+      }
+    }
+  }
   //comando de dar play em música
   if (msg.content.includes("play" && prefixo + "p")) {
     servidores.server.connection = await msg.member.voice.channel.join();
