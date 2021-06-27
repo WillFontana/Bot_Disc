@@ -36,6 +36,10 @@ client.on("message", async (msg) => {
   // Gadiao (Gabriel)
   if (msg.content === prefixo + "gadiao") {
     msg.channel.send("Muuu, muuu, mas ela é diferente meu!");
+    servidores.server.connection = await msg.member.voice.channel.join();
+    servidores.server.connection.play(
+      ytdl("https://www.youtube.com/watch?v=3xq4-jr248s", ytdlOptions)
+    );
   }
 
   //comando camila
@@ -81,6 +85,21 @@ client.on("message", async (msg) => {
     );
   }
 
+  //Comando para calcular idade
+  if (msg.content.includes("idade")) {
+    const idade = msg.content.split(" ")[1];
+    const ano = parseInt(2021 - idade);
+    if (ano < 0) {
+      let ac = "a.C ";
+      parseInt(idade);
+      number = 2021;
+      ano2 = number - idade;
+      msg.channel.send(`${ac}${ano2 * -1}`);
+    } else {
+      msg.channel.send(`Pera ai, é serio que você é de ${ano} ?? Credo`);
+    }
+  }
+  
   //comando de dar play em música
   if (msg.content.includes("play" && prefixo + "p")) {
     servidores.server.connection = await msg.member.voice.channel.join();
