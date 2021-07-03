@@ -122,9 +122,9 @@ client.on("message", async (msg) => {
       msg.channel.send(sum);
     }
     if (msg.content.includes("/")) {
-      if (msg.content.includes("0 / 0")) {
+      if (msg.content.includes(" / 0")) {
         msg.channel.send(
-          "Primeira lei da matemática babaca... Zero não se divide por zero..."
+          "Primeira lei da matemática babaca... Não se pode dividir por zero..."
         );
       } else {
         let numero1 = msg.content.split(" ")[1];
