@@ -24,28 +24,18 @@ client.on("message", async (msg) => {
   //filtro
   if (!msg.guild) return;
   if (!msg.content.startsWith(prefixo)) return;
-  if (!msg.member.voice.channel) {
-    msg.channel.send(
-      "Pera ai, tu quer que eu entre em um canal de voz e nem está em um? Tá achando que sou palhaço é?"
-    );
-    return;
-  }
 
-  // comandos
+  // Comandos
 
   // Gadiao (Gabriel)
   if (msg.content === prefixo + "gadiao") {
-    msg.channel.send("Muuu, muuu, mas ela é diferente meu!");
+    msg.channel.send("Nossa gastei mo grana atoa mano...");
     servidores.server.connection = await msg.member.voice.channel.join();
     servidores.server.connection.play(
       ytdl("https://www.youtube.com/watch?v=3xq4-jr248s", ytdlOptions)
     );
   }
-
-  //comando camila
-  if (msg.content === prefixo + "camilla") {
-    msg.channel.send("KKKKK ela é cuie vei");
-  } //comando Matheus
+  //comando Matheus
   if (msg.content === prefixo + "matheus") {
     msg.channel.send(
       "Teu monitor é ultrawide? Pq eu vo manda nude aqui... 8======================================D"
@@ -84,7 +74,6 @@ client.on("message", async (msg) => {
       "@will_fontana ; Link: https://www.instagram.com/will_fontana/"
     );
   }
-
   //Comando para calcular idade
   if (msg.content.includes("idade")) {
     const idade = msg.content.split(" ")[1];
@@ -107,19 +96,19 @@ client.on("message", async (msg) => {
       let numero1 = msg.content.split(" ")[1];
       let numero2 = msg.content.split("+ ")[1];
       let sum = parseFloat(numero1) + parseFloat(numero2);
-      msg.channel.send(sum);
+      msg.channel.send(sum.toFixed(2));
     }
     if (msg.content.includes("-")) {
       let numero1 = msg.content.split(" ")[1];
       let numero2 = msg.content.split("- ")[1];
       let sum = parseFloat(numero1) - parseFloat(numero2);
-      msg.channel.send(sum);
+      msg.channel.send(sum.toFixed(2));
     }
     if (msg.content.includes("*")) {
       let numero1 = msg.content.split(" ")[1];
       let numero2 = msg.content.split("* ")[1];
       let sum = parseFloat(numero1) * parseFloat(numero2);
-      msg.channel.send(sum);
+      msg.channel.send(sum.toFixed(2));
     }
     if (msg.content.includes("/")) {
       if (msg.content.includes(" / 0")) {
@@ -130,16 +119,24 @@ client.on("message", async (msg) => {
         let numero1 = msg.content.split(" ")[1];
         let numero2 = msg.content.split("/ ")[1];
         let sum = parseFloat(numero1) / parseFloat(numero2);
-        msg.channel.send(sum);
+        msg.channel.send(sum.toFixed(2));
       }
+    }
+    if (msg.content.includes("raiz")) {
+      const numero = msg.content.split(" ")[2];
+      const total = Math.sqrt(numero);
+      msg.channel.send(total);
     }
   }
   //comando de dar play em música
   if (msg.content.includes("play" && prefixo + "p")) {
+    if (!msg.member.voice.channel) {
+      msg.channel.send(
+        "Pera ai, tu quer que eu entre em um canal de voz e nem está em um? Tá achando que sou palhaço é?"
+      );
+      return;
+    }
     servidores.server.connection = await msg.member.voice.channel.join();
-    msg.channel.send(
-      "To adentrando no canal de voz de vocês gostoso, e to trazendo música de origem duvidosa!"
-    );
     const { content } = msg;
 
     const video = content.split(" ")[1];
