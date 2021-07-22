@@ -127,6 +127,22 @@ client.on("message", async (msg) => {
       const total = Math.sqrt(numero);
       msg.channel.send(total);
     }
+    if (msg.content.includes("rcubica")) {
+      const numero = msg.content.split(" ")[2];
+      const total = Math.cbrt(numero);
+      msg.channel.send(total.toFixed(2).replace(".", ","));
+    }
+    if (msg.content.includes("potencia")) {
+      const numero = msg.content.split(" ")[2];
+      const numero2 = msg.content.split(" ")[3];
+      const total = Math.pow(numero, numero2);
+      msg.channel.send(total.toFixed(2).replace(".", ","));
+    }
+    if (msg.content.includes("seno")) {
+      const numero = msg.content.split(" ")[2];
+      const total = Math.sin(numero);
+      msg.channel.send(total.toFixed(2).replace(".", ","));
+    }
   }
   //comando de dar play em música
   if (msg.content.includes("play" && prefixo + "p")) {
