@@ -84,10 +84,12 @@ client.on("message", async (msg) => {
       number = 2021;
       ano2 = number - idade;
       msg.channel.send(
-        `Tu realmente nasceu em ${ano2 * -1} ${ac} ? Tá de sacanagem irmão`
+        `Cara, é meio que impossivel você ser de ${
+          ano2 * -1
+        } ${ac}. Sério, não tem como... `
       );
     } else {
-      msg.channel.send(`Pera ai, é serio que você é de ${ano} ?? Credo`);
+      msg.channel.send(`Alá mano, o cara é de ${ano}, kkkkkkkkkkkkk`);
     }
   }
   // Comando de contas
