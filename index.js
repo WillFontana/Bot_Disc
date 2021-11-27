@@ -20,7 +20,7 @@ client.on("ready", () => {
   console.log("Vo me adentra no server gostosamente!");
 });
 
-client.on("message", async (msg) => {
+client.on("message", async msg => {
   //filtro
   if (!msg.guild) return;
   if (!msg.content.startsWith(prefixo)) return;
@@ -74,6 +74,7 @@ client.on("message", async (msg) => {
       "@will_fontana ; Link: https://www.instagram.com/will_fontana/"
     );
   }
+
   //Comando para calcular idade
   if (msg.content.includes("idade")) {
     const idade = msg.content.split(" ")[1];
@@ -93,10 +94,20 @@ client.on("message", async (msg) => {
   // Comando de contas
   if (msg.content.includes("conta")) {
     if (msg.content.includes("+")) {
-      let numero1 = msg.content.split(" ")[1];
-      let numero2 = msg.content.split("+ ")[1];
-      let sum = parseFloat(numero1) + parseFloat(numero2);
-      msg.channel.send(sum.toFixed(2));
+      let numero = msg.content.split(" ");
+      for (i = 0; i <= numero.length; i++) {
+        if (typeof numero[i] === "string") {
+          numero.splice(i, 1);
+        }
+      }
+      var array = numero.map(x => {
+        return parseInt(x);
+      });
+      var soma = 0;
+      for (i = 0; i < array.length; i++) {
+        soma = soma + array[i];
+      }
+      msg.channel.send(soma.toFixed(2).replace(".", ","));
     }
     if (msg.content.includes("-")) {
       let numero1 = msg.content.split(" ")[1];
