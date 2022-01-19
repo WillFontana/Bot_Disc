@@ -74,21 +74,23 @@ client.on("message", async (msg) => {
 
     //Validando request
     const { content } = msg;
-    const link = content.split(" ");
-    link.shift();
 
-    if (link.length === 0) {
+    if (content.length === 0) {
       msg.channel.send("Insira pelo menos um link ou nome");
     }
 
+    const link = content.split(" ");
+    link.shift();
+
     if (ytdl.validateURL(link)) {
       servidores.server.queue.push(link);
-      console.log("Adicionado: ", link);
       playMusics();
     } else {
+      const search = content.split(" ");
+      search.shift();
       youtube.search.list(
         {
-          q: link,
+          q: search.join(" "),
           part: "snippet",
           fields: "items(id(videoId), snippet(title))",
           type: "video",
