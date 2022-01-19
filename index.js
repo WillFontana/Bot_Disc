@@ -2,22 +2,26 @@ const Discord = require("discord.js");
 const ytdl = require("ytdl-core");
 const client = new Discord.Client();
 const configs = require("./config.json");
+const google = require("googleapis");
+
+const youtube = new google.youtube_v3.Youtube({
+  version: "v3",
+  auth: configs.GOOGLE_KEY,
+});
 
 const prefixo = configs.PREFIX;
-
-const ytdlOptions = {
-  filter: "audioonly",
-};
 
 const servidores = {
   server: {
     connection: null,
     dispatcher: null,
+    queue: [],
+    playing: false,
   },
 };
 
 client.on("ready", () => {
-  console.log("Iniciando serviços");
+  console.log("Iniciado");
 });
 
 client.on("message", async (msg) => {
@@ -36,6 +40,19 @@ client.on("message", async (msg) => {
     servidores.server.connection = await msg.member.voice.channel.join();
   }
 
+  //Comando zerar fila
+  if (msg.content === prefixo + "zerar") {
+    if (servidores.server.connection !== null) {
+      let musics = servidores.server.queue;
+      console.log("musics:", musics);
+      console.log("musics[0]:", musics[0]);
+      musics.map((item) => {
+        if (typeof item !== Array) musics.pop();
+      });
+    }
+    console.log("Servidores:", servidores.server.queue);
+  }
+
   //Comando de sair
   if (msg.content === prefixo + "sair") {
     msg.member.voice.channel.leave();
@@ -49,16 +66,44 @@ client.on("message", async (msg) => {
       msg.channel.send("Você precisa estar em um canal de voz");
       return;
     }
-    servidores.server.connection = await msg.member.voice.channel.join();
-    const { content } = msg;
 
-    const link = content.split(" ")[1];
+    //Bot entra na call
+    if (servidores.server.connection === null) {
+      servidores.server.connection = await msg.member.voice.channel.join();
+    }
+
+    //Validando request
+    const { content } = msg;
+    const link = content.split(" ");
+    link.shift();
+
+    if (link.length === 0) {
+      msg.channel.send("Insira pelo menos um link ou nome");
+    }
+
     if (ytdl.validateURL(link)) {
-      servidores.server.dispatcher = servidores.server.connection.play(
-        ytdl(link, ytdlOptions)
-      );
+      servidores.server.queue.push(link);
+      console.log("Adicionado: ", link);
+      playMusics();
     } else {
-      msg.channel.send("Insira um link válido");
+      youtube.search.list(
+        {
+          q: link,
+          part: "snippet",
+          fields: "items(id(videoId), snippet(title))",
+          type: "video",
+        },
+        function (err, result) {
+          if (err) console.log(err);
+
+          if (result) {
+            const videoId = `https://www.youtube.com/watch?v=${result.data.items[0].id.videoId}`;
+            servidores.server.queue.push(videoId);
+            console.log("Adicionado id: ", videoId);
+            playMusics();
+          }
+        }
+      );
     }
   }
 
@@ -72,5 +117,27 @@ client.on("message", async (msg) => {
     servidores.server.dispatcher.resume();
   }
 });
+
+const playMusics = () => {
+  if (servidores.server.playing === false) {
+    const playing = servidores.server.queue[0];
+    servidores.server.playing = true;
+
+    servidores.server.dispatcher = servidores.server.connection.play(
+      ytdl(playing, configs.YTDL)
+    );
+
+    servidores.server.dispatcher.on("finish", () => {
+      servidores.server.queue.shift();
+      servidores.server.playing = false;
+
+      if (servidores.server.queue.length > 0) {
+        playMusics();
+      } else {
+        servidores.server.dispatcher = null;
+      }
+    });
+  }
+};
 
 client.login(configs.TOKEN_DISCORD);
