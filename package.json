@@ -15,9 +15,13 @@
     "discord.js": "^12.5.3",
     "ffmpeg-static": "^4.3.0",
 <<<<<<< HEAD
+<<<<<<< HEAD
     "ytdl-core": "^4.9.1"
 =======
     "yarn": "^1.22.10",
+=======
+    "googleapis": "^92.0.0",
+>>>>>>> master
     "ytdl-core": "^4.5.0"
 >>>>>>> 6396e75099a6db794d5a8f9b365ce4bcd8dfcc4e
   },
