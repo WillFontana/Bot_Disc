@@ -44,8 +44,6 @@ client.on("message", async (msg) => {
   if (msg.content === prefixo + "zerar") {
     if (servidores.server.connection !== null) {
       let musics = servidores.server.queue;
-      console.log("musics:", musics);
-      console.log("musics[0]:", musics[0]);
       musics.map((item) => {
         if (typeof item !== Array) musics.pop();
       });
@@ -92,17 +90,75 @@ client.on("message", async (msg) => {
         {
           q: search.join(" "),
           part: "snippet",
-          fields: "items(id(videoId), snippet(title))",
+          fields: "items(id(videoId), snippet(title, channelTitle))",
           type: "video",
         },
         function (err, result) {
           if (err) console.log(err);
 
           if (result) {
-            const videoId = `https://www.youtube.com/watch?v=${result.data.items[0].id.videoId}`;
-            servidores.server.queue.push(videoId);
-            console.log("Adicionado id: ", videoId);
-            playMusics();
+            const resultList = [];
+
+            //Constroi menssagem embed
+            for (let i in result.data.items) {
+              const mountItem = {
+                videoTitle: result.data.items[i].snippet.title,
+                channelName: result.data.items[i].snippet.channelTitle,
+                id:
+                  "https://www.youtube.com/watch?v=" +
+                  result.data.items[i].id.videoId,
+              };
+              resultList.push(mountItem);
+            }
+            const embed = new Discord.MessageEmbed()
+              .setColor([255, 153, 51])
+              .setAuthor("FireBot")
+              .setDescription("Escolha de 1 a 5");
+
+            //Cria os campos de cada resultado
+            for (let i in resultList) {
+              embed.addField(
+                `${parseInt(i) + 1}: ${resultList[i].videoTitle}`,
+                resultList[i].channelName
+              );
+            }
+            msg.channel.send(embed).then((embedMessage) => {
+              const reacts = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"];
+
+              //reações para cada emoji
+              for (let i = 0; i < reacts.length; i++) {
+                embedMessage.react(reacts[i]);
+              }
+
+              const filter = (reaction, user) => {
+                return (
+                  reacts.includes(reaction.emoji.name) &&
+                  user.id === msg.author.id
+                );
+              };
+              embedMessage
+                .awaitReactions(filter, {
+                  max: 1,
+                  time: 20000,
+                  errors: ["time"],
+                })
+                .then((collected) => {
+                  const reaction = collected.first();
+                  const idOption = reacts.indexOf(reaction.emoji.name);
+
+                  const newEmbed = new Discord.MessageEmbed().setDescription(
+                    `Opção escolhida: ${resultList[idOption].videoTitle} de ${resultList[idOption].channelName}`
+                  );
+                  msg.channel.send(newEmbed);
+
+                  servidores.server.queue.push(resultList[idOption].id);
+                  playMusics();
+                })
+                .catch((error) => {
+                  msg.reply("Opção inválida");
+                  console.log(error);
+                });
+            });
           }
         }
       );
@@ -111,12 +167,20 @@ client.on("message", async (msg) => {
 
   //Pausar stream
   if (msg.content === prefixo + "pause") {
-    servidores.server.dispatcher.pause();
+    if (servidores.server.connection !== null) {
+      servidores.server.dispatcher.pause();
+    } else {
+      msg.channel.send("Você precisa estar em um canal de voz");
+    }
   }
 
   //Resumir stream
   if (msg.content === prefixo + "resume") {
-    servidores.server.dispatcher.resume();
+    if (servidores.server.connection !== null) {
+      servidores.server.dispatcher.resume();
+    } else {
+      msg.channel.send("Você precisa estar em um canal de voz");
+    }
   }
 });
 
