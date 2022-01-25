@@ -3,6 +3,7 @@ const ytdl = require("ytdl-core");
 const client = new Discord.Client();
 const configs = require("./config.json");
 const google = require("googleapis");
+const fs = require("fs");
 
 const youtube = new google.youtube_v3.Youtube({
   version: "v3",
@@ -11,20 +12,24 @@ const youtube = new google.youtube_v3.Youtube({
 
 const prefixo = configs.PREFIX;
 
-const servidores = {
-  server: {
+const servidores = [];
+
+client.on("guildCreate", (guild) => {
+  servidores[guild.id] = {
     connection: null,
     dispatcher: null,
     queue: [],
     playing: false,
-  },
-};
+  };
+  saveServer(guild.id);
+});
 
 client.on("ready", () => {
+  loadServers();
   console.log("Iniciado");
 });
 
-client.on("message", async msg => {
+client.on("message", async (msg) => {
   //filtro
   if (!msg.guild) return;
   if (!msg.content.startsWith(prefixo)) return;
@@ -37,25 +42,26 @@ client.on("message", async msg => {
       msg.channel.send("Você precisa estar em um canal de voz");
       return;
     }
-    servidores.server.connection = await msg.member.voice.channel.join();
+    servidores[msg.guild.id].connection = await msg.member.voice.channel.join();
   }
 
   //Comando zerar fila
   if (msg.content === prefixo + "zerar") {
-    if (servidores.server.connection !== null) {
-      let musics = servidores.server.queue;
+    if (servidores[msg.guild.id].connection !== null) {
+      let musics = servidores[msg.guild.id].queue;
       musics.map((item) => {
         if (typeof item !== Array) musics.pop();
       });
     }
-    console.log("Servidores:", servidores.server.queue);
   }
 
   //Comando de sair
   if (msg.content === prefixo + "sair") {
     msg.member.voice.channel.leave();
-    servidores.server.connection = null;
-    servidores.server.dispatcher = null;
+    servidores[msg.guild.id].connection = null;
+    servidores[msg.guild.id].dispatcher = null;
+    servidores[msg.guild.id].playing = false;
+    servidores[msg.guild.id].queue = [];
   }
 
   //comando de dar play em música
@@ -66,8 +72,9 @@ client.on("message", async msg => {
     }
 
     //Bot entra na call
-    if (servidores.server.connection === null) {
-      servidores.server.connection = await msg.member.voice.channel.join();
+    if (servidores[msg.guild.id].connection === null) {
+      servidores[msg.guild.id].connection =
+        await msg.member.voice.channel.join();
     }
 
     //Validando request
@@ -81,8 +88,8 @@ client.on("message", async msg => {
     link.shift();
 
     if (ytdl.validateURL(link)) {
-      servidores.server.queue.push(link);
-      playMusics();
+      servidores[msg.guild.id].queue.push(link);
+      playMusics(msg);
     } else {
       const search = content.split(" ");
       search.shift();
@@ -151,8 +158,8 @@ client.on("message", async msg => {
                   );
                   msg.channel.send(newEmbed);
 
-                  servidores.server.queue.push(resultList[idOption].id);
-                  playMusics();
+                  servidores[msg.guild.id].queue.push(resultList[idOption].id);
+                  playMusics(msg);
                 })
                 .catch((error) => {
                   msg.reply("Opção inválida");
@@ -183,8 +190,8 @@ client.on("message", async msg => {
 
   //Pausar stream
   if (msg.content === prefixo + "pause") {
-    if (servidores.server.connection !== null) {
-      servidores.server.dispatcher.pause();
+    if (servidores[msg.guild.id].connection !== null) {
+      servidores[msg.guild.id].dispatcher.pause();
     } else {
       msg.channel.send("Você precisa estar em um canal de voz");
     }
@@ -192,34 +199,68 @@ client.on("message", async msg => {
 
   //Resumir stream
   if (msg.content === prefixo + "resume") {
-    if (servidores.server.connection !== null) {
-      servidores.server.dispatcher.resume();
+    if (servidores[msg.guild.id].connection !== null) {
+      servidores[msg.guild.id].dispatcher.resume();
     } else {
       msg.channel.send("Você precisa estar em um canal de voz");
     }
   }
 });
 
-const playMusics = () => {
-  if (servidores.server.playing === false) {
-    const playing = servidores.server.queue[0];
-    servidores.server.playing = true;
+const playMusics = (msg) => {
+  if (servidores[msg.guild.id].playing === false) {
+    const playing = servidores[msg.guild.id].queue[0];
+    servidores[msg.guild.id].playing = true;
 
-    servidores.server.dispatcher = servidores.server.connection.play(
-      ytdl(playing, configs.YTDL)
-    );
+    servidores[msg.guild.id].dispatcher = servidores[
+      msg.guild.id
+    ].connection.play(ytdl(playing, configs.YTDL));
 
-    servidores.server.dispatcher.on("finish", () => {
-      servidores.server.queue.shift();
-      servidores.server.playing = false;
+    servidores[msg.guild.id].dispatcher.on("finish", () => {
+      servidores[msg.guild.id].queue.shift();
+      servidores[msg.guild.id].playing = false;
 
-      if (servidores.server.queue.length > 0) {
-        playMusics();
+      if (servidores[msg.guild.id].queue.length > 0) {
+        playMusics(msg);
       } else {
-        servidores.server.dispatcher = null;
+        servidores[msg.guild.id].dispatcher = null;
       }
     });
   }
+};
+
+const loadServers = () => {
+  fs.readFile("serversList.json", "utf8", (err, data) => {
+    if (err) {
+      console.log("Ocorreu um erro ao carregar os servidores: ", err);
+    } else {
+      const objRead = JSON.parse(data);
+
+      console.log("i: ", objRead.servers);
+      objRead.servers.map((item) => {
+        servidores[item] = {
+          connection: null,
+          dispatcher: null,
+          queue: [],
+          playing: false,
+        };
+      });
+    }
+  });
+};
+
+const saveServer = (newIdServer) => {
+  fs.readFile("serversList.json", "utf8", (err, data) => {
+    if (err) {
+      console.log("Ocorreu um erro ao salvar o servidor: ", err);
+    } else {
+      const objRead = JSON.parse(data);
+      objRead.servers.push(newIdServer);
+
+      const objWrite = JSON.stringify(objRead);
+      fs.writeFile("serversList.json", objWrite, "utf8", () => {});
+    }
+  });
 };
 
 client.login(configs.TOKEN_DISCORD);
