@@ -49,9 +49,7 @@ client.on("message", async (msg) => {
   if (msg.content === prefixo + "zerar") {
     if (servidores[msg.guild.id].connection !== null) {
       let musics = servidores[msg.guild.id].queue;
-      musics.map((item) => {
-        if (typeof item !== Array) musics.pop();
-      });
+      musics.splice(1, musics.length);
     }
   }
 
@@ -88,7 +86,7 @@ client.on("message", async (msg) => {
     link.shift();
 
     if (ytdl.validateURL(link)) {
-      servidores[msg.guild.id].queue.push(link);
+      servidores[msg.guild.id].queue.push(link.join(""));
       playMusics(msg);
     } else {
       const search = content.split(" ");
@@ -170,28 +168,25 @@ client.on("message", async (msg) => {
         }
       );
     }
-    if (msg.content.includes("rcubica")) {
-      const numero = msg.content.split(" ")[2];
-      const total = Math.cbrt(numero);
-      msg.channel.send(total.toFixed(2).replace(".", ","));
-    }
-    if (msg.content.includes("potencia")) {
-      const numero = msg.content.split(" ")[2];
-      const numero2 = msg.content.split(" ")[3];
-      const total = Math.pow(numero, numero2);
-      msg.channel.send(total.toFixed(2).replace(".", ","));
-    }
-    if (msg.content.includes("seno")) {
-      const numero = msg.content.split(" ")[2];
-      const total = Math.sin(numero);
-      msg.channel.send(total.toFixed(2).replace(".", ","));
-    }
   }
 
   //Pausar stream
   if (msg.content === prefixo + "pause") {
     if (servidores[msg.guild.id].connection !== null) {
       servidores[msg.guild.id].dispatcher.pause();
+    } else {
+      msg.channel.send("Você precisa estar em um canal de voz");
+    }
+  }
+
+  if (msg.content === prefixo + "skip") {
+    if (!servidores[msg.guild.id].queue[1])
+      return msg.channel.send("Você não possui mais músicas na fila");
+    if (servidores[msg.guild.id].connection !== null) {
+      servidores[msg.guild.id].queue.shift();
+      servidores[msg.guild.id].playing = false;
+
+      playMusics(msg);
     } else {
       msg.channel.send("Você precisa estar em um canal de voz");
     }
@@ -236,7 +231,6 @@ const loadServers = () => {
     } else {
       const objRead = JSON.parse(data);
 
-      console.log("i: ", objRead.servers);
       objRead.servers.map((item) => {
         servidores[item] = {
           connection: null,
