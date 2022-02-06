@@ -24,21 +24,12 @@ client.on("ready", () => {
   console.log("Iniciado");
 });
 
-client.on("message", async msg => {
+client.on("message", async (msg) => {
   //filtro
   if (!msg.guild) return;
   if (!msg.content.startsWith(prefixo)) return;
 
   // Comandos
-
-  //entrar em um servidor
-  if (msg.content === prefixo + "entre") {
-    if (!msg.member.voice.channel) {
-      msg.channel.send("Você precisa estar em um canal de voz");
-      return;
-    }
-    servidores.server.connection = await msg.member.voice.channel.join();
-  }
 
   //Comando zerar fila
   if (msg.content === prefixo + "zerar") {
@@ -48,7 +39,6 @@ client.on("message", async msg => {
         if (typeof item !== Array) musics.pop();
       });
     }
-    console.log("Servidores:", servidores.server.queue);
   }
 
   //Comando de sair
@@ -163,28 +153,26 @@ client.on("message", async msg => {
         }
       );
     }
-    if (msg.content.includes("rcubica")) {
-      const numero = msg.content.split(" ")[2];
-      const total = Math.cbrt(numero);
-      msg.channel.send(total.toFixed(2).replace(".", ","));
-    }
-    if (msg.content.includes("potencia")) {
-      const numero = msg.content.split(" ")[2];
-      const numero2 = msg.content.split(" ")[3];
-      const total = Math.pow(numero, numero2);
-      msg.channel.send(total.toFixed(2).replace(".", ","));
-    }
-    if (msg.content.includes("seno")) {
-      const numero = msg.content.split(" ")[2];
-      const total = Math.sin(numero);
-      msg.channel.send(total.toFixed(2).replace(".", ","));
-    }
   }
 
   //Pausar stream
   if (msg.content === prefixo + "pause") {
     if (servidores.server.connection !== null) {
       servidores.server.dispatcher.pause();
+    } else {
+      msg.channel.send("Você precisa estar em um canal de voz");
+    }
+  }
+
+  //Skipar musica
+  if (msg.content === prefixo + "skip") {
+    if (!servidores.server.queue[1])
+      return msg.channel.send("Você não possui mais músicas na fila");
+    if (servidores.server.connection !== null) {
+      servidores.server.queue.shift();
+      servidores.server.playing = false;
+
+      playMusics();
     } else {
       msg.channel.send("Você precisa estar em um canal de voz");
     }
